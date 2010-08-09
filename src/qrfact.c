@@ -221,8 +221,8 @@ double **readFromFile(FILE *fe){
   double **A;
   int i,j,n_col=0;
   if (fe == NULL) {
-    printf("El archivo no existe \n");
-    exit (EXIT_FAILURE);
+    fprintf(stderr, "Can't open input file\n");
+    exit(EXIT_FAILURE);
   } else {
     printf("Lectura de la matriz en archivo\n");
     fscanf(fe,"%d",&n_col);
