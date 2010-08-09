@@ -1,4 +1,5 @@
 #ifndef QRFACT_H
+#include <stdio.h>
 #define QRFACT_H
 
 void qr(double**);
@@ -15,8 +16,8 @@ double* sumaVectores(double*,double*);
 void copiarColumna(double*,double*);
 double** crearA(double, double, double);
 double** multiplica(double**, double**);
-double** readFromFIle(FILE *);
-void writeToFile(FILE *, double**,int);
+double** readFromFile(FILE*);
+void writeToFile(FILE*, double**,int);
 
 #define SIZE 10
 

@@ -217,46 +217,41 @@ double **multiplica(double **matriz1,double **matriz2){
   return matrizR;
 }
 
-double **readFromFIle(FILE *fe){
-	double **A;
-	int i,j,n_col=0;
-	if (fe == NULL)
-    {
-        printf("El archivo no existe \n");
-        exit (EXIT_FAILURE);
+double **readFromFile(FILE *fe){
+  double **A;
+  int i,j,n_col=0;
+  if (fe == NULL) {
+    printf("El archivo no existe \n");
+    exit (EXIT_FAILURE);
+  } else {
+    printf("Lectura de la matriz en archivo\n");
+    fscanf(fe,"%d",&n_col);
+    A=(double **)malloc (n_col*sizeof(double*));
+    for(i=0;i<n_col;i++)
+      A[i]=(double *)malloc (n_col*sizeof(double));
+    for(i=0;i<n_col;i++) {
+      for(j=0;j<n_col;j++){
+	fscanf(fe, "%lf", &A[i][j]);
+	printf("%lf ", A[i][j]);
+      }
+      printf("\n");
     }
-    else
-    {
-		printf("Lectura de la matriz en archivo\n");
-		fscanf(fe,"%d",&n_col);
-		A=(double **)malloc (n_col*sizeof(double*));
-		for(i=0;i<n_col;i++)
-			A[i]=(double *)malloc (n_col*sizeof(double));
-		for(i=0;i<n_col;i++)
-		{
-			for(j=0;j<n_col;j++){
-				fscanf(fe, "%lf", &A[i][j]);
-				printf("%lf ", A[i][j]);
-			}
-			printf("\n");
-		}
-    }
-    fclose(fe);
-	return A;	
+  }
+  fclose(fe);
+  return A;	
 }
 
-void writeToFile(FILE *fs, double** matriz,int n_col){
-	int i,j;
-	printf("Escritura de matriz en archivo\n");
-	for(i=0;i<n_col;i++)
-	{
-		for(j=0;j<n_col;j++){
-			fprintf(fs,"%lf\t",matriz[i][j]);
-			printf("%lf ", matriz[i][j]);
-		}
-		fprintf(fs,"\n");
-		printf("\n");
-	}
-	fclose(fs); 
-	
+void writeToFile(FILE *fs, double** matriz, int n_col){
+  int i,j;
+  printf("Escritura de matriz en archivo\n");
+  for(i=0;i<n_col;i++) {
+    for(j=0;j<n_col;j++){
+      fprintf(fs,"%lf\t",matriz[i][j]);
+      printf("%lf ", matriz[i][j]);
+    }
+    fprintf(fs,"\n");
+    printf("\n");
+  }
+  fclose(fs); 
 }
+
