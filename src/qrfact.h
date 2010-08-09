@@ -15,6 +15,8 @@ double* sumaVectores(double*,double*);
 void copiarColumna(double*,double*);
 double** crearA(double, double, double);
 double** multiplica(double**, double**);
+double** readFromFIle(FILE *);
+void writeToFile(FILE *, double**,int);
 
 #define SIZE 10
 
