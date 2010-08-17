@@ -19,6 +19,6 @@ double** multiplica(double**, double**);
 double** readFromFile(FILE*);
 void writeToFile(FILE*, double**,int);
 
-#define SIZE 10
+#define SIZE 3
 
 #endif
