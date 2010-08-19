@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-O2 -std=gnu99 -Wall
+CFLAGS=-O2 -std=gnu99 -Wall -g -ggdb
 
 SRC_DIR=src
 BIN_DIR=bin
