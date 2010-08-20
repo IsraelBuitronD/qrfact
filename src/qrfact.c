@@ -30,16 +30,16 @@ int main(int argc, const char * argv[]){
 	r=AllocateMatrixSpace();
     A=InitializingA(start,final,SIZE);
 	// Iterative proccess 
-	for (i=0;i<25;i++){
+	for (i=0;i<80;i++){
 		QR_Method(A);
-		Transpose(q);
+		//Transpose(q);
 		A=Multiplication(q,A);
 		Transpose(q);
-		A=Multiplication(A,q);
+		A=Multiplication(q,A);
 	}
-	WriteToFile(M_A,A,SIZE);
-	WriteToFile(M_R,q,SIZE);
-	WriteToFile(M_Q,r,SIZE);
+	//WriteToFile(M_A,A,SIZE);
+	WriteToFile(M_Q,q,SIZE);
+	WriteToFile(M_R,r,SIZE);
 	
 }
 
@@ -75,7 +75,7 @@ double **InitializingA(double StartPoint, double FinalPoint, double PartitionNum
 					T=0;
 				Q=0;
 			}
-			result[i][j]=div*T+Q;
+			result[i][j]=(div*T)+Q;
 		}
 	}
 	return result;
@@ -120,7 +120,10 @@ void QR_Method(double **a){
 #pragma omp parallel for private(j)
 	for(i=0;i<SIZE;i++){
 		for(j=0;j<SIZE;j++){
-			r[i][j]=DotProduct(a[i],q[j]);
+			if (j>i) {
+				r[i][j]=0;
+			}else
+				r[i][j]=DotProduct(a[i],q[j]);
 		}
 	}
 	Transpose(a);
