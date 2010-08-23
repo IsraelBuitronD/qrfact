@@ -4,91 +4,77 @@
 #include <stdlib.h>
 #include <omp.h>
 
-int SIZE;
-//double **q,**r;
 
 int main(int argc, const char * argv[]){
 	
-	SIZE=0;
-	double start=0.0, final=0.0;
-	double **M; 
-	//----------------------------------------------------------------------
-	printf("\n ----------Seccion 1 Numerov ----------\n");
-	start=(double)  atoi(argv[1]);
-	final=(double)  atoi(argv[2]);
-	SIZE= atoi(argv[3]);
-	M = StartM();
+  double **M; 
+
+  printf("----------Seccion 1 Numerov ----------\n");
+  double start = strtod(argv[1], (char **)NULL);
+  double final = strtod(argv[2], (char **)NULL);
+  int size = strtol(argv[3], (char **)NULL, 10);
 	
-	printf("\nStart Point: %lf\n",start);
-    printf("\nFinal Point:  %lf\n ", final);
-	printf("\nPartition Size: %d\n", SIZE);
-	printf("\nCPUs Number: %d\n",omp_get_num_procs());
-	omp_set_num_threads(omp_get_num_procs()*2);
-	/* 
-		M= I - (1/12)T
-		K= (1/h^2)T + MQ
-		Iterativo A = (M^(-1))*K
-	*/
+  printf("Start:\t%lf\n",start);
+  printf("Final:\t%lf\n", final);
+  printf("Size:\t%d\n", size);
+  printf("CPUs:\t%d\n",omp_get_num_procs());
+  omp_set_num_threads(omp_get_num_procs()*2);
+
+  M = StartM(size);
+  /* 
+     M= I - (1/12)T
+     K= (1/h^2)T + MQ
+     Iterativo A = (M^(-1))*K
+  */
 	
-	//----------------------------------------------------------------------
-	printf("\n ----------Seccion 2 Corrimiento de Lambda------------");
+  printf("----------Seccion 2 Corrimiento de Lambda------------\n");
 	
-	//----------------------------------------------------------------------
-	printf("\n  ----------Seccion 3 RK ----------");
+  printf("----------Seccion 3 RK ----------\n");
 	
 	
 }
 
-double **AllocateMatrixSpace(){
-	int i;
-	double **m;
-	m=(double**)malloc(sizeof(double)*SIZE);
-	for(i=0;i<SIZE;i++){
-		m[i]=(double*)malloc(sizeof(double)*SIZE);
-	}
-	return m;
+double** AllocateMatrixSpace(int size){
+  double **m = (double**)malloc(sizeof(double)*size);
+  for(int i=0;i<size;i++)
+    m[i]=(double*)malloc(sizeof(double)*size);
+  return m;
 }
-double **StartM(){
-	double **Res,**T; 
-	int i,j;
-	Res = AllocateMatrixSpace();
-	T = AllocateMatrixSpace();
-	
-	for(i=0;i<SIZE;i++){
-		T[i][i]=2.0*(1.0/12.0);
-		if(i>0)
-			T[i][i-1]=-1.0*(1.0/12.0);
-		if(i<SIZE-1)
-			T[i][i+1]=-1.0*(1.0/12.0);
-	}
-	PrintMatrix(T);
-	for (i=0;i<SIZE;i++)
-	{
-     	for (j=0;j<SIZE;j++){
-			if(i==j){
-				Res[i][j]=1.0-T[i][j];
-			}else{
-				Res[i][j]=0.0-T[i][j];
-			}
-			
-		}
-	}
 
-	PrintMatrix(Res);
-	return Res; 
+double** StartM(int size){
+  double** Res = AllocateMatrixSpace(size);
+  double** T = AllocateMatrixSpace(size);
+	
+  for(int i=0;i<size;i++){
+    T[i][i]=2.0*(1.0/12.0);
+    if(i>0)
+      T[i][i-1]=-1.0*(1.0/12.0);
+    if(i<size-1)
+      T[i][i+1]=-1.0*(1.0/12.0);
+  }
+
+  PrintMatrix(T,size);
+
+  for(int i=0;i<size;i++) {
+    for(int j=0;j<size;j++){
+      Res[i][j] = (i==j ? 1.0 : 0.0) - T[i][j];
+    }
+  }
+
+  PrintMatrix(Res,size);
+  return Res; 
 }  
 
-void PrintMatrix(double **matriz){
-	int i,j;
-	printf("++++++++++++++++++++++++++++\n");
-	for(i=0;i<SIZE;i++){
-		for(j=0;j<SIZE;j++){
-			printf("%lf\t",matriz[i][j]);
-		}
-		printf("\n");
-	}
-	printf("++++++++++++++++++++++++++++\n");
+void PrintMatrix(double** matriz, int size){
+  printf("++++++++++++++++++++++++++++\n");
+  for(int i=0;i<size;i++) {
+    for(int j=0;j<size;j++)
+      printf("%lf\t",matriz[i][j]);
+    printf("\n");
+  }
+  printf("++++++++++++++++++++++++++++\n");
 }
+
 /*
 double **InitializingA(double StartPoint, double FinalPoint, double PartitionNumber){
 	double **result;
