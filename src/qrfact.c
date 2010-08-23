@@ -150,7 +150,7 @@ void Transpose(double **matriz){
 		}
 	}
 }
-/*
+
 void QR_Method(double **a){
 	int i,j;
 	double *columna_tem,tem;
