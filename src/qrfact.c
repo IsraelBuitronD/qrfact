@@ -6,20 +6,21 @@
 
 int SIZE;
 //double **q,**r;
-
+double **T;
 int main(int argc, const char * argv[]){
 	
 	SIZE=0;
-	int i;
 	double start=0.0, final=0.0;
-	double **M; 
+	double **M,**Q; 
 	//----------------------------------------------------------------------
 	printf("\n ----------Seccion 1 Numerov ----------\n");
 	start=(double)  atoi(argv[1]);
 	final=(double)  atoi(argv[2]);
 	SIZE= atoi(argv[3]);
+	printf("\n\t Matriz M\n");
 	M = StartM();
-	
+	printf("\n\t Matriz M\n");
+	Q = StartQ(start,final,SIZE);
 	printf("\nStart Point: %lf\n",start);
     printf("\nFinal Point:  %lf\n ", final);
 	printf("\nPartition Size: %d\n", SIZE);
@@ -50,7 +51,7 @@ double **AllocateMatrixSpace(){
 	return m;
 }
 double **StartM(){
-	double **Res,**T; 
+	double **Res; 
 	int i,j;
 	Res = AllocateMatrixSpace();
 	T = AllocateMatrixSpace();
@@ -62,7 +63,7 @@ double **StartM(){
 		if(i<SIZE-1)
 			T[i][i+1]=-1.0*(1.0/12.0);
 	}
-	PrintMatrix(T);
+	//PrintMatrix(T);
 	for (i=0;i<SIZE;i++)
 	{
      	for (j=0;j<SIZE;j++){
@@ -75,20 +76,37 @@ double **StartM(){
 		}
 	}
 
-	PrintMatrix(Res);
+	//PrintMatrix(Res);
 	return Res; 
 }  
+double **StartQ(double Start, double End, double NP){
+	double **res;
+	res= AllocateMatrixSpace();
+	for (i=0;i<SIZE;i++)
+	{
+     	for (j=0;j<SIZE;j++){
+			/* 
+				Evaluamos la función para generar Q
+				
+			*/
+			Res[i][j]=
+		}
+	}
 
+	//PrintMatrix(res);
+	return res;
+	
+}
 void PrintMatrix(double **matriz){
 	int i,j;
-	printf("++++++++++++++++++++++++++++\n");
+	printf("_____________________________\n");
 	for(i=0;i<SIZE;i++){
 		for(j=0;j<SIZE;j++){
 			printf("%lf\t",matriz[i][j]);
 		}
 		printf("\n");
 	}
-	printf("++++++++++++++++++++++++++++\n");
+	printf("_____________________________\n");
 }
 /*
 double **InitializingA(double StartPoint, double FinalPoint, double PartitionNumber){
