@@ -7,6 +7,8 @@ double** AllocateMatrixSpace();
 double** InitializingA(double, double, double);
 void Transpose(double**);
 double **StartM();
+double **StartQ(double,double, double);
+double** K_Process(double **);
 void QR_Method(double**);
 double** Multiplication(double**, double**);
 void CopyMatrix(double**, double**);

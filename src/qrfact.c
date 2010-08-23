@@ -6,30 +6,41 @@
 
 int SIZE;
 //double **q,**r;
-double **T;
+double **T,**M,h;
 int main(int argc, const char * argv[]){
-	
 	SIZE=0;
 	double start=0.0, final=0.0;
-	double **M,**Q; 
+	double **Q,**K; 
 	//----------------------------------------------------------------------
 	printf("\n ----------Seccion 1 Numerov ----------\n");
-	start=(double)  atoi(argv[1]);
-	final=(double)  atoi(argv[2]);
-	SIZE= atoi(argv[3]);
-	printf("\n\t Matriz M\n");
-	M = StartM();
-	printf("\n\t Matriz M\n");
-	Q = StartQ(start,final,SIZE);
+	start=0.001;//(double)  atoi(argv[1]);
+	final=3.1416;//(double)  atoi(argv[2]);
+	SIZE= atoi(argv[1]);
+	
 	printf("\nStart Point: %lf\n",start);
     printf("\nFinal Point:  %lf\n ", final);
 	printf("\nPartition Size: %d\n", SIZE);
 	printf("\nCPUs Number: %d\n",omp_get_num_procs());
 	omp_set_num_threads(omp_get_num_procs()*2);
+	
+	printf("\n\t Matriz M\n");
+	M = StartM();
+	PrintMatrix(M);
+	printf("\n\t Matriz Q\n");
+	Q = StartQ(start,final,SIZE);
+	PrintMatrix(Q);
+	K= AllocateMatrixSpace();
+	K= K_Process(Q);
+	printf("\n\t Matriz K\n");
+	PrintMatrix(K);
 	/* 
 		M= I - (1/12)T
 		K= (1/h^2)T + MQ
-		Iterativo A = (M^(-1))*K
+		
+		Iterativo 
+			A = (M^(-1))*K
+			A=Q'R
+			K= (1/h^2)T + MQ'
 	*/
 	
 	//----------------------------------------------------------------------
@@ -82,20 +93,57 @@ double **StartM(){
 double **StartQ(double Start, double End, double NP){
 	double **res;
 	res= AllocateMatrixSpace();
+	h= (End-Start)/NP;
+	double x= Start;
+	int i,j;
 	for (i=0;i<SIZE;i++)
 	{
      	for (j=0;j<SIZE;j++){
 			/* 
 				Evaluamos la función para generar Q
-				
+				Monopolo Mágnetico: -1/(x^3)				
 			*/
-			Res[i][j]=
+			if(i==j){
+				res[i][j]=((-1.0)/(x*x*x));
+				x=x+h;
+			}
+			else{
+			res[i][j]=0;
+			}
+			
 		}
 	}
-
-	//PrintMatrix(res);
 	return res;
 	
+}
+double **K_Process(double **Q){
+	// K= (1/h^2)*T+(MQ)
+	double **MR,**P_MQ;
+	int i,j;
+	MR = AllocateMatrixSpace();
+	P_MQ = AllocateMatrixSpace();
+	P_MQ = Multiplication(M,Q);
+	for (i=0;i<SIZE;i++)
+	{
+     	for (j=0;j<SIZE;j++){
+			MR[i][j]= (((1/(h*h))*T[i][j])+(P_MQ[i][j]));
+		}
+	}
+	return MR;
+}
+
+double **Multiplication(double **matriz1,double **matriz2){
+	int i,j,k;
+	double **matrizR=AllocateMatrixSpace();
+	for(i=0;i<SIZE;i++){
+		for(j=0;j<SIZE;j++){
+			for(k=0;k<SIZE;k++){
+				matrizR[i][j]+=matriz1[i][k]*matriz2[k][j];
+			}
+		}
+	}
+	//PrintMatrix(matrizR);
+	return matrizR;
 }
 void PrintMatrix(double **matriz){
 	int i,j;
@@ -245,18 +293,6 @@ void CopyColumn(double *a,double *b){
 }
 
 
-double **Multiplication(double **matriz1,double **matriz2){
-	int i,j,k;
-	double **matrizR=AllocateMatrixSpace();
-	for(i=0;i<SIZE;i++){
-		for(j=0;j<SIZE;j++){
-			for(k=0;k<SIZE;k++){
-				matrizR[i][j]+=matriz1[i][k]*matriz2[k][j];
-			}
-		}
-	}
-	return matrizR;
-}
 
 void PrintMatrix(double **matriz){
 	int i,j;
