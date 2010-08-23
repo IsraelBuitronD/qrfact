@@ -10,7 +10,6 @@ int SIZE;
 int main(int argc, const char * argv[]){
 	
 	SIZE=0;
-	int i;
 	double start=0.0, final=0.0;
 	double **M; 
 	//----------------------------------------------------------------------
@@ -132,7 +131,7 @@ void Transpose(double **matriz){
 		}
 	}
 }
-/*
+
 void QR_Method(double **a){
 	int i,j;
 	double *columna_tem,tem;
