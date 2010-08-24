@@ -3,10 +3,11 @@
 #define QRFACT_H
 
 
-double** AllocateMatrixSpace();
+double** AllocateMatrixSpace(int);
 double** InitializingA(double, double, double);
 void Transpose(double**);
-double **StartM(int);
+double** StartM(int);
+double** StartQ(double, double, int);
 void QR_Method(double**);
 double** Multiplication(double**, double**);
 void CopyMatrix(double**, double**);

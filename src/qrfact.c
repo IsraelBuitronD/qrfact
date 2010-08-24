@@ -4,11 +4,10 @@
 #include <stdlib.h>
 #include <omp.h>
 
+double h;
 
 int main(int argc, const char * argv[]){
 	
-  double **M; 
-
   printf("----------Seccion 1 Numerov ----------\n");
   double start = strtod(argv[1], (char **)NULL);
   double final = strtod(argv[2], (char **)NULL);
@@ -20,7 +19,10 @@ int main(int argc, const char * argv[]){
   printf("CPUs:\t%d\n",omp_get_num_procs());
   omp_set_num_threads(omp_get_num_procs()*2);
 
-  M = StartM(size);
+  printf("Matriz M\n");
+  double **M = StartM(size);
+  printf("Matriz Q\n");
+  double **Q = StartQ(start,final,size);
   /* 
      M= I - (1/12)T
      K= (1/h^2)T + MQ
@@ -53,7 +55,7 @@ double** StartM(int size){
       T[i][i+1]=-1.0*(1.0/12.0);
   }
 
-  PrintMatrix(T,size);
+  //PrintMatrix(T,size);
 
   for(int i=0;i<size;i++) {
     for(int j=0;j<size;j++){
@@ -61,9 +63,32 @@ double** StartM(int size){
     }
   }
 
-  PrintMatrix(Res,size);
+  //PrintMatrix(Res,size);
   return Res; 
 }  
+
+double **StartQ(double Start, double End, int size){
+  double** res = AllocateMatrixSpace(size);
+  h= (End-Start)/(double)size;
+  double x= Start;
+
+  for(int i=0; i<size; i++) {
+    for (int j=0; j<size; j++){
+      /* 
+       * Evaluamos la función para generar Q
+       * Monopolo Mágnetico: -1/(x^3)                                
+       */
+      if(i==j){
+	res[i][j]=((-1.0)/(x*x*x));
+	x=x+h;
+      }	else
+	res[i][j]=0;
+    }
+  }
+  
+  return res;
+  
+}
 
 void PrintMatrix(double** matriz, int size){
   printf("++++++++++++++++++++++++++++\n");
