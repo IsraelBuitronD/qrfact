@@ -15,7 +15,7 @@ matrix.o:
 	${CC} ${CFLAGS} -c -o ${BIN_DIR}/matrix.o ${SRC_DIR}/matrix.c
 
 test_matrix: matrix.o
-	${CC} ${CFLAGS} -o ${BIN_DIR}/test_matrix ${BIN_DIR}/matrix.o ${SRC_DIR}/test_matrix.c
+	${CC} ${CFLAGS} -lm -o ${BIN_DIR}/test_matrix ${BIN_DIR}/matrix.o ${SRC_DIR}/test_matrix.c
 
 qrfact:	matrix.o qrfact.o
 	${CC} ${CFLAGS} -lm -fopenmp -o ${BIN_DIR}/qrfact ${BIN_DIR}/qrfact.o ${BIN_DIR}/matrix.o 
