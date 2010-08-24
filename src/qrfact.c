@@ -3,9 +3,9 @@
 #include <math.h>
 #include <stdlib.h>
 #include <omp.h>
-
+#include "matrix.h"
 int main(int argc, const char * argv[]){
-	
+  int i;	
   printf("----------Seccion 1 Numerov ----------\n");
   //double start = strtod(argv[1], (char **)NULL);
   double start=0.001;
@@ -22,22 +22,22 @@ int main(int argc, const char * argv[]){
   double **T = NULL;
   printf("Matriz M\n");
   double **M = StartM(&T,size);
-  PrintMatrix(M,size);
+  //PrintMatrix(M,size);
 
   printf("Matriz Q\n");
   double h;
   double **Q = StartQ(start,final,&h,size);
-  PrintMatrix(Q,size);
+  //PrintMatrix(Q,size);
   double **K = K_Process(M,Q,T,&h,size);
   printf("Matriz K\n");
-  PrintMatrix(K,size);
+  //PrintMatrix(K,size);
   /* 
      M= I - (1/12)T
      K= (1/h^2)T + MQ
      Iterativo A = (M^(-1))*K
   */
   double **A= AllocateMatrixSpace(size);
-  double **Qp= AllocateMatrixSpace(size);
+  double **Qp=AllocateMatrixSpace(size);
   double **Mi= AllocateMatrixSpace(size);
   
   printf("\n");
@@ -46,12 +46,23 @@ int main(int argc, const char * argv[]){
   //Qp = QR_Process(A);
 	for (i=0;i<80;i++){
 		A= Multiplication(M,K,size);
+		//printf("-----A-----\n");
+		//PrintMatrix(A,size);
 		Qp = QR_Method(A,size);
+		//printf("-----Qp-----\n");
+		//PrintMatrix(Qp,size);
 		K = K_Process(M,Qp,T,&h,size);
+		//printf("-----K-----\n");
+		//PrintMatrix(K,size);	
 	}
-		
+		printf("-----K----- After Iteration\n");
+  		PrintMatrix(K,size);
   printf("----------Seccion 2 Corrimiento de Lambda------------\n");
-	
+		double **P=AllocateMatrixSpace(size);
+		double miu=0.001;
+		P= P_Process(K,miu,M,size);
+		printf("-----P-----\n");
+  		PrintMatrix(P,size);
   printf("----------Seccion 3 RK ----------\n");
 	
 	
@@ -129,7 +140,7 @@ double **Multiplication(double** matriz1, double** matriz2, int size){
   for(int i=0;i<size;i++)
     for(int j=0;j<size;j++)
       for(int k=0;k<size;k++)
-	matrizR[i][j]+=matriz1[i][k]*matriz2[k][j];
+	    matrizR[i][j]+=matriz1[i][k]*matriz2[k][j];
 
   //PrintMatrix(matrizR,size);
   return matrizR;
@@ -144,128 +155,102 @@ void PrintMatrix(double** matriz, int size) {
 }
 
 
-
-void Transpose(double **matriz){
-	double tem;
-	int i,j;
-	for(i=0;i<SIZE;i++){
-		for(j=i;j<SIZE;j++){
-			if (i!=j) {
-				tem=matriz[i][j];
-				matriz[i][j]=matriz[j][i];
-				matriz[j][i]=tem;
-			}
-		}
-	}
-}
-
 double** QR_Method(double **a,int size){
 	int i,j;
 	double **q= AllocateMatrixSpace(size);
+	double **r= AllocateMatrixSpace(size);
 	double *columna_tem,tem;
-	Transpose(a);
-	CopyMatrix(a,q);
+	applyTranspose(a,size);
+	CopyMatrix(a,q,size);
 #pragma omp parallel for private(j)
-	for(i=0;i<SIZE;i++){
+	for(i=0;i<size;i++){
 		for(j=0;j<i;j++){
-			tem=DotProduct(a[i],q[j]);
-			tem/=DotProduct(q[j],q[j]);	
-			columna_tem=DotProductVector(-tem,q[j]);
-			columna_tem=SumVectors(q[i],columna_tem);
-			CopyColumn(q[i],columna_tem);
+			tem=DotProduct(a[i],q[j],size);
+			tem/=DotProduct(q[j],q[j],size);	
+			columna_tem=DotProductVector(-tem,q[j],size);
+			columna_tem=SumVectors(q[i],columna_tem,size);
+			CopyColumn(q[i],columna_tem,size);
 		}
 	}
 	
 #pragma omp parallel for private(tem)
-	for(i=0;i<SIZE;i++) {
-		tem=DotProduct(q[i],q[i]);
-		DotProductVector_E(1.0/sqrt(tem),q[i]);
+	for(i=0;i<size;i++) {
+		tem=DotProduct(q[i],q[i],size);
+		DotProductVector_E(1.0/sqrt(tem),q[i],size);
 	}
 	
 #pragma omp parallel for private(j)
-	for(i=0;i<SIZE;i++){
-		for(j=0;j<SIZE;j++){
+	for(i=0;i<size;i++){
+		for(j=0;j<size;j++){
 			if (j>i) {
 				r[i][j]=0;
 			}else
-				r[i][j]=DotProduct(a[i],q[j]);
+				r[i][j]=DotProduct(a[i],q[j],size);
 		}
 	}
-	Transpose(a);
-	Transpose(q);
-	Transpose(r);
+	applyTranspose(a,size);
+	applyTranspose(q,size);
+	applyTranspose(r,size);
+	return q;
 }
 
-void CopyMatrix(double **a,double **b){
+void CopyMatrix(double **a,double **b,int size){
 	int i,j;
-	for(i=0;i<SIZE;i++){
-		for(j=0;j<SIZE;j++){
+	for(i=0;i<size;i++){
+		for(j=0;j<size;j++){
 			b[i][j]=a[i][j];
 		}
 	}
 }
 
-double DotProduct(double *a,double *b){
+double DotProduct(double *a,double *b,int size){
 	int i;
 	double producto=0;
 #pragma omp parallel for reduction(+:producto)
-	for(i=0;i<SIZE;i++){
+	for(i=0;i<size;i++){
 		producto+=a[i]*b[i];
 	}
 	return producto;
 }
 
-double *DotProductVector(double e,double *v){
+double *DotProductVector(double e,double *v,int size){
 	double *v_tem;
 	int i;
-	v_tem=(double*)malloc(sizeof(double)*SIZE);
+	v_tem=(double*)malloc(sizeof(double)*size);
 #pragma omp parallel for 
-	for(i=0;i<SIZE;i++){
+	for(i=0;i<size;i++){
 		v_tem[i]=v[i]*e;
 	}
 	return v_tem;
 }
 
-void DotProductVector_E(double e,double *v){
+void DotProductVector_E(double e,double *v,int size){
 	int i;
 #pragma omp parallel for 
-	for(i=0;i<SIZE;i++){
+	for(i=0;i<size;i++){
 		v[i]=v[i]*e;
 	}
 }
 
-double *SumVectors(double *a,double *b){
+double *SumVectors(double *a,double *b,int size){
 	int i;
-	double *suma=(double*)malloc(sizeof(double)*SIZE);
+	double *suma=(double*)malloc(sizeof(double)*size);
 #pragma omp parallel for 
-	for(i=0;i<SIZE;i++){
+	for(i=0;i<size;i++){
 		suma[i]=a[i]+b[i];
 	}
 	return suma;
 }
 
 
-void CopyColumn(double *a,double *b){
+void CopyColumn(double *a,double *b,int size){
 	int i;
 #pragma omp parallel for 
-	for(i=0;i<SIZE;i++){
+	for(i=0;i<size;i++){
 		a[i]=b[i];
 	}
 }
 
-
-
-void PrintMatrix(double **matriz){
-	int i,j;
-	printf("++++++++++++++++++++++++++++\n");
-	for(i=0;i<SIZE;i++){
-		for(j=0;j<SIZE;j++){
-			printf("%lf\t",matriz[i][j]);
-		}
-		printf("\n");
-	}
-	printf("++++++++++++++++++++++++++++\n");
-}
 
 
 void WriteToFile(FILE *fs, double** matriz, int n_col){
@@ -282,4 +267,14 @@ void WriteToFile(FILE *fs, double** matriz, int n_col){
 	fclose(fs); 
 }
 
-*/
+double** P_Process(double **K,double miu, double **M,int size){
+	double **res= NULL;
+	res = AllocateMatrixSpace(size);
+	int i,j;
+	for(i=0;i<size;i++){
+		for(j=0;j<size;j++){
+			res[i][j]=((K[i][j])-(miu*M[i][j]));
+		}
+	}
+	return res;
+}

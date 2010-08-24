@@ -5,20 +5,19 @@
 
 double** AllocateMatrixSpace(int);
 double** InitializingA(double, double, double);
-void Transpose(double**);
 double** StartM(double***, int);
 double** StartQ(double, double, double*, int);
 double** K_Process(double**, double**, double**, double*, int);
-void QR_Method(double**);
+double** QR_Method(double**,int);
 double** Multiplication(double**, double**, int);
-void CopyMatrix(double**, double**);
-double DotProduct(double*,double*);
-void DotProductVector_E(double,double*);
-double* DotProductVector(double,double*);
-double* SumVectors(double*,double*);
+void CopyMatrix(double**, double**,int);
+double DotProduct(double*,double*,int);
+void DotProductVector_E(double,double*,int);
+double* DotProductVector(double,double*,int);
+double* SumVectors(double*,double*,int);
 void PrintMatrix(double**,int);
-void CopyColumn(double*,double*);
+void CopyColumn(double*,double*,int);
 void WriteToFile(FILE*, double**,int);
-
+double **P_Process(double**,double,double**,int size);
 
 #endif
