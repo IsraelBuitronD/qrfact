@@ -1,5 +1,6 @@
 #include "matrix.h"
 #include <stdlib.h>
+#include <math.h>
 #include <stdio.h>
 
 void applyTranspose(double** m, int n) {
@@ -68,4 +69,39 @@ double** getIdentitySqrMat(int size) {
   }
 
   return mat;
+}
+
+double determinant(double **a,int size) {
+  if (size < 1) { // Invalid matrix size
+    fprintf(stderr, "Matrix size must be greater than zero.\n");
+    exit(EXIT_FAILURE);
+  } 
+  
+  if(size == 1) // 1x1 Matrix
+    return a[0][0];
+  
+  if(size == 2) // 2x2 Matrix
+    return a[0][0] * a[1][1] - a[1][0] * a[0][1];
+
+  // nxn Matrix => n>=3
+  
+  double det = 0;
+  
+  for(int j1=0; j1<size; j1++) {
+    double **m = getZeroSqrMat(size-1);
+
+    for(int i=1;i<size;i++)
+      for(int j=0, j2=0; j<size; j++) {
+	if (j == j1)
+	  continue;
+	m[i-1][j2] = a[i][j];
+	j2++;
+      }
+
+    det += pow(-1.0,j1+2.0) * a[0][j1] * determinant(m,size-1);
+
+    freeSqrMat(m,size-1);    
+  }
+
+  return det;
 }

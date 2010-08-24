@@ -45,6 +45,31 @@ int main(int argc, char** argv) {
   freeSqrMat(mat,3);
   
 
+  // Compute matrix determinant 
+  mat = getZeroSqrMat(4);
+  mat[0][0]=1;
+  mat[0][1]=2;
+  mat[0][2]=3;
+  mat[0][3]=4;
+  mat[1][0]=4;
+  mat[1][1]=1;
+  mat[1][2]=2;
+  mat[1][3]=3;
+  mat[2][0]=3;
+  mat[2][1]=4;
+  mat[2][2]=1;
+  mat[2][3]=2;
+  mat[3][0]=2;
+  mat[3][1]=3;
+  mat[3][2]=4;
+  mat[3][3]=1;
+  printf("Matrix\n");
+  printSqrMat(mat,4);
+  double det = determinant(mat, 4);
+  printf("Det\t%lf\t%s\n", det, (det==-160.0 ? "correct" : "wrong") );
+  freeSqrMat(mat,4);
+  
+
   return 0;
 
 }
