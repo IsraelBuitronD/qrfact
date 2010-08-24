@@ -6,10 +6,11 @@
 double** AllocateMatrixSpace(int);
 double** InitializingA(double, double, double);
 void Transpose(double**);
-double** StartM(int);
-double** StartQ(double, double, int);
+double** StartM(double***, int);
+double** StartQ(double, double, double*, int);
+double** K_Process(double**, double**, double**, double*, int);
 void QR_Method(double**);
-double** Multiplication(double**, double**);
+double** Multiplication(double**, double**, int);
 void CopyMatrix(double**, double**);
 double DotProduct(double*,double*);
 void DotProductVector_E(double,double*);

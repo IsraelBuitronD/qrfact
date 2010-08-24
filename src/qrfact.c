@@ -4,13 +4,13 @@
 #include <stdlib.h>
 #include <omp.h>
 
-double h;
-
 int main(int argc, const char * argv[]){
 	
   printf("----------Seccion 1 Numerov ----------\n");
-  double start = strtod(argv[1], (char **)NULL);
-  double final = strtod(argv[2], (char **)NULL);
+  //double start = strtod(argv[1], (char **)NULL);
+  double start=0.001;
+  //double final = strtod(argv[2], (char **)NULL);
+  double final=3.1416;
   int size = strtol(argv[3], (char **)NULL, 10);
 	
   printf("Start:\t%lf\n",start);
@@ -19,10 +19,18 @@ int main(int argc, const char * argv[]){
   printf("CPUs:\t%d\n",omp_get_num_procs());
   omp_set_num_threads(omp_get_num_procs()*2);
 
+  double **T = NULL;
   printf("Matriz M\n");
-  double **M = StartM(size);
+  double **M = StartM(&T,size);
+  PrintMatrix(M,size);
+
   printf("Matriz Q\n");
-  double **Q = StartQ(start,final,size);
+  double h;
+  double **Q = StartQ(start,final,&h,size);
+  PrintMatrix(Q,size);
+  double **K = K_Process(M,Q,T,&h,size);
+  printf("Matriz K\n");
+  PrintMatrix(K,size);
   /* 
      M= I - (1/12)T
      K= (1/h^2)T + MQ
@@ -43,33 +51,31 @@ double** AllocateMatrixSpace(int size){
   return m;
 }
 
-double** StartM(int size){
+double** StartM(double*** T, int size){
   double** Res = AllocateMatrixSpace(size);
-  double** T = AllocateMatrixSpace(size);
+  *T = AllocateMatrixSpace(size);
 	
   for(int i=0;i<size;i++){
-    T[i][i]=2.0*(1.0/12.0);
+    (*T)[i][i]=2.0*(1.0/12.0);
     if(i>0)
-      T[i][i-1]=-1.0*(1.0/12.0);
+      (*T)[i][i-1]=-1.0*(1.0/12.0);
     if(i<size-1)
-      T[i][i+1]=-1.0*(1.0/12.0);
+      (*T)[i][i+1]=-1.0*(1.0/12.0);
   }
 
-  //PrintMatrix(T,size);
+  //PrintMatrix(*T,size);
 
-  for(int i=0;i<size;i++) {
-    for(int j=0;j<size;j++){
-      Res[i][j] = (i==j ? 1.0 : 0.0) - T[i][j];
-    }
-  }
+  for(int i=0;i<size;i++)
+    for(int j=0;j<size;j++)
+      Res[i][j] = (i==j ? 1.0 : 0.0) - (*T)[i][j];
 
   //PrintMatrix(Res,size);
   return Res; 
 }  
 
-double **StartQ(double Start, double End, int size){
+double** StartQ(double Start, double End, double* h, int size){
   double** res = AllocateMatrixSpace(size);
-  h= (End-Start)/(double)size;
+  *h = (End-Start)/(double)size;
   double x= Start;
 
   for(int i=0; i<size; i++) {
@@ -80,7 +86,7 @@ double **StartQ(double Start, double End, int size){
        */
       if(i==j){
 	res[i][j]=((-1.0)/(x*x*x));
-	x=x+h;
+	x=x+*h;
       }	else
 	res[i][j]=0;
     }
@@ -90,14 +96,38 @@ double **StartQ(double Start, double End, int size){
   
 }
 
-void PrintMatrix(double** matriz, int size){
-  printf("++++++++++++++++++++++++++++\n");
+double **K_Process(double **M, double **Q, double **T, double *h, int size) {
+  // K= (1/h^2)*T+(MQ)
+  double **MR = AllocateMatrixSpace(size);
+  //double **P_MQ = AllocateMatrixSpace(size);
+  //P_MQ = Multiplication(M,Q,size);
+  double **P_MQ = Multiplication(M,Q,size);
+
+  for(int i=0;i<size;i++)
+    for(int j=0;j<size;j++)
+      MR[i][j]= (((1/((*h)*(*h)))*T[i][j])+(P_MQ[i][j]));
+
+  return MR;
+}
+
+double **Multiplication(double** matriz1, double** matriz2, int size){
+  double **matrizR = AllocateMatrixSpace(size);
+
+  for(int i=0;i<size;i++)
+    for(int j=0;j<size;j++)
+      for(int k=0;k<size;k++)
+	matrizR[i][j]+=matriz1[i][k]*matriz2[k][j];
+
+  //PrintMatrix(matrizR,size);
+  return matrizR;
+}
+
+void PrintMatrix(double** matriz, int size) {
   for(int i=0;i<size;i++) {
     for(int j=0;j<size;j++)
       printf("%lf\t",matriz[i][j]);
     printf("\n");
   }
-  printf("++++++++++++++++++++++++++++\n");
 }
 
 /*
@@ -237,18 +267,6 @@ void CopyColumn(double *a,double *b){
 }
 
 
-double **Multiplication(double **matriz1,double **matriz2){
-	int i,j,k;
-	double **matrizR=AllocateMatrixSpace();
-	for(i=0;i<SIZE;i++){
-		for(j=0;j<SIZE;j++){
-			for(k=0;k<SIZE;k++){
-				matrizR[i][j]+=matriz1[i][k]*matriz2[k][j];
-			}
-		}
-	}
-	return matrizR;
-}
 
 void PrintMatrix(double **matriz){
 	int i,j;
