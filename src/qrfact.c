@@ -39,14 +39,16 @@ int main(int argc, const char * argv[]){
   double **A= AllocateMatrixSpace(size);
   double **Qp= AllocateMatrixSpace(size);
   double **Mi= AllocateMatrixSpace(size);
+  
   printf("\n");
   printf("Proceso Iterativo de QR\n");
- 
-  A= Multiplication(M,K,size);
-
-  printf("Matriz A\n");
-  PrintMatrix(A,size);
+  //PrintMatrix(A,size);
   //Qp = QR_Process(A);
+	for (i=0;i<80;i++){
+		A= Multiplication(M,K,size);
+		Qp = QR_Method(A,size);
+		K = K_Process(M,Qp,T,&h,size);
+	}
 		
   printf("----------Seccion 2 Corrimiento de Lambda------------\n");
 	
@@ -141,34 +143,7 @@ void PrintMatrix(double** matriz, int size) {
   }
 }
 
-/*
-double **InitializingA(double StartPoint, double FinalPoint, double PartitionNumber){
-	double **result;
-	result=AllocateMatrixSpace();
-	int i,j;
-	double PartitionSize=(FinalPoint-StartPoint)/PartitionNumber;
-	double T,Q,div,actual=StartPoint;
-	div=1/(PartitionSize*PartitionSize);
-	for(i=0;i<PartitionNumber;i++){
-		for(j=0;j<PartitionNumber;j++){
-			if(i==j){
-				T=2;
-				actual=StartPoint+PartitionSize*i;
-				Q=(actual-0.5)*(actual-0.5); // Function Implementation (X-0.5)
-			}
-			else{
-				if( (i<PartitionNumber-1&&(i==j+1||i==j-1))||(i>0&&(i==j-1||i==j+1 ) )){
-					T=-1;
-				}
-				else
-					T=0;
-				Q=0;
-			}
-			result[i][j]=(div*T)+Q;
-		}
-	}
-	return result;
-}
+
 
 void Transpose(double **matriz){
 	double tem;
@@ -184,8 +159,9 @@ void Transpose(double **matriz){
 	}
 }
 
-void QR_Method(double **a){
+double** QR_Method(double **a,int size){
 	int i,j;
+	double **q= AllocateMatrixSpace(size);
 	double *columna_tem,tem;
 	Transpose(a);
 	CopyMatrix(a,q);
