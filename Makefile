@@ -9,8 +9,11 @@ all:	clean qrfact
 qrfact.o:	
 	${CC} ${CFLAGS} -c -fopenmp -o ${BIN_DIR}/qrfact.o ${SRC_DIR}/qrfact.c
 
-qrfact:	qrfact.o
-	${CC} ${CFLAGS} ${BIN_DIR}/qrfact.o -lm -fopenmp -o ${BIN_DIR}/qrfact
+matrix.o:
+	${CC} ${CFLAGS} -c -o ${BIN_DIR}/matrix.o ${SRC_DIR}/matrix.c
+
+qrfact:	matrix.o qrfact.o
+	${CC} ${CFLAGS} -lm -fopenmp -o ${BIN_DIR}/qrfact ${BIN_DIR}/qrfact.o ${BIN_DIR}/matrix.o 
 
 clean:
 	rm -f ${BIN_DIR}/*
