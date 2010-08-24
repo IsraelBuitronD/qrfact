@@ -36,9 +36,9 @@ void printDelimSqrMat(double** m, char delim, int size) {
   }
 }
 
-int areEqualsSqrMat(double** m1, double** m2, int n) {
-  for(int i=0; i<n; i++)
-    for(int j=0; j<n; j++)
+int areEqualsSqrMat(double** m1, double** m2, int size) {
+  for(int i=0; i<size; i++)
+    for(int j=0; j<size; j++)
       if(m1[i][j] != m2[i][j])
 	return NOT_EQUAL_VALUES;
 
@@ -46,24 +46,24 @@ int areEqualsSqrMat(double** m1, double** m2, int n) {
 }
 
 double** getZeroSqrMat(int size) {
-  double** mat = (double**)calloc(3,sizeof(double*));
-  for(int i=0; i<3; i++)
-    mat[i] = (double*)calloc(3,sizeof(double));
+  double** mat = (double**)calloc(size,sizeof(double*));
+  for(int i=0; i<size; i++)
+    mat[i] = (double*)calloc(size,sizeof(double));
 
   return mat;
 }
 
 double** freeSqrMat(double** m, int size) {
-  for(int i=0; i<3; i++)
+  for(int i=0; i<size; i++)
     free(m[i]);
   free(m);
   return m;
 }
 
 double** getIdentitySqrMat(int size) {
-  double** mat = (double**)calloc(3,sizeof(double*));
-  for(int i=0; i<3; i++) {
-    mat[i] = (double*)calloc(3,sizeof(double));
+  double** mat = (double**)calloc(size,sizeof(double*));
+  for(int i=0; i<size; i++) {
+    mat[i] = (double*)calloc(size,sizeof(double));
     mat[i][i] = 1;
   }
 
