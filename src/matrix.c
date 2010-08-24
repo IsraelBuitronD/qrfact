@@ -138,3 +138,11 @@ double** comatrix(double **a, int size) {
 
   return b;
 }
+
+double** applyScalarMultiplication(double** m, int size, double scalar) {
+  for(int i=0; i<size; i++)
+    for(int j=0; j<size; j++)
+      m[i][j] *= scalar;
+  
+  return m;
+}
