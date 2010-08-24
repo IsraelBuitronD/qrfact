@@ -13,5 +13,6 @@ double** getZeroSqrMat(int);
 double** freeSqrMat(double**, int);
 double** getIdentitySqrMat(int);
 double determinant(double**, int);
+double** comatrix(double **, int);
 
 #endif

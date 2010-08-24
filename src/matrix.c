@@ -105,3 +105,36 @@ double determinant(double **a,int size) {
 
   return det;
 }
+
+double** comatrix(double **a, int size) {
+  double **b = getZeroSqrMat(size);
+  double **c = getZeroSqrMat(size-1);
+
+  for(int j=0;j<size;j++) {
+    for(int i=0;i<size;i++) {
+
+      // Form the adjoint a_ij
+      for(int ii=0, i1 = 0; ii<size; ii++) {
+	if (ii == i)
+	  continue;
+	for(int jj=0, j1=0; jj<size; jj++) {
+	  if (jj == j)
+	    continue;
+	  c[i1][j1] = a[ii][jj];
+	  j1++;
+	}
+	i1++;
+      }
+
+      // Compute determinat
+      double det = determinant(c,size-1);
+
+      // Fill comatrix elements
+      b[i][j] = pow(-1.0,i+j+2.0) * det;
+    }
+  }
+
+  freeSqrMat(c,size-1);
+
+  return b;
+}
