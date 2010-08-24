@@ -1,5 +1,6 @@
 #include "matrix.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 void applyTranspose(double** m, int n) {
   double tmp;
