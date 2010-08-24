@@ -11,7 +11,7 @@ int main(int argc, const char * argv[]){
   double start=0.001;
   //double final = strtod(argv[2], (char **)NULL);
   double final=3.1416;
-  int size = strtol(argv[3], (char **)NULL, 10);
+  int size = strtol(argv[1], (char **)NULL, 10);//atoi(argv[3]);//
 	
   printf("Start:\t%lf\n",start);
   printf("Final:\t%lf\n", final);
@@ -36,7 +36,18 @@ int main(int argc, const char * argv[]){
      K= (1/h^2)T + MQ
      Iterativo A = (M^(-1))*K
   */
-	
+  double **A= AllocateMatrixSpace(size);
+  double **Qp= AllocateMatrixSpace(size);
+  double **Mi= AllocateMatrixSpace(size);
+  printf("\n");
+  printf("Proceso Iterativo de QR\n");
+ 
+  A= Multiplication(M,K,size);
+
+  printf("Matriz A\n");
+  PrintMatrix(A,size);
+  //Qp = QR_Process(A);
+		
   printf("----------Seccion 2 Corrimiento de Lambda------------\n");
 	
   printf("----------Seccion 3 RK ----------\n");
