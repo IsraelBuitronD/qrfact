@@ -68,7 +68,25 @@ int main(int argc, char** argv) {
   double det = determinant(mat, 4);
   printf("Det\t%lf\t%s\n", det, (det==-160.0 ? "correct" : "wrong") );
   freeSqrMat(mat,4);
-  
+
+
+  // Compute cofactor matrix
+  mat = getZeroSqrMat(3);
+  mat[0][0]=-4;
+  mat[0][1]=2;
+  mat[0][2]=1;
+  mat[1][0]=1;
+  mat[1][1]=-10;
+  mat[1][2]=1;
+  mat[2][0]=3;
+  mat[2][1]=-1;
+  mat[2][2]=-2;
+  printf("Matrix\n");
+  printSqrMat(mat,3);
+  double** comat = comatrix(mat,3);
+  printf("CoMatrix\n");
+  printSqrMat(comat,3);
+  freeSqrMat(comat,3);
 
   return 0;
 
