@@ -1,5 +1,5 @@
 #include "matrix.h"
-#include <malloc.h>
+#include <stdlib.h>
 
 void applyTranspose(double** m, int n) {
   double tmp;
