@@ -39,42 +39,58 @@ int main(int argc, const char * argv[]){
   double **A= AllocateMatrixSpace(size);
   double **Qp=AllocateMatrixSpace(size);
   double **Mi= AllocateMatrixSpace(size);
-  
+  Mi= getSqrMatInverse(M,size);
+  double eps= 0.400;
+ //printf("\t---Matriz Transpuesta M\n");
+ //PrintMatrix(Mi,size);
   printf("\n");
   printf("Proceso Iterativo de QR\n");
   //PrintMatrix(A,size);
   //Qp = QR_Process(A);
-	for (i=0;i<80;i++){ //Cambiar por un while
-		A= Multiplication(M,K,size);
-		//printf("-----A-----\n");
-		//PrintMatrix(A,size);
+    A= Multiplication(Mi,K,size);
+	for(i=0;i<120;i++){//while(*A[1,1]>eps){ //Cambiar por un while
 		Qp = QR_Method(A,size);
 		//printf("-----Qp-----\n");
 		//PrintMatrix(Qp,size);
-		K = K_Process(M,Qp,T,&h,size);
+		K = K_Process(Mi,Qp,T,&h,size);
 		//printf("-----K-----\n");
-		//PrintMatrix(K,size);	
+		//PrintMatrix(K,size);
+		A= Multiplication(Mi,K,size);
+		//printf("-----A-----\n");
+		//PrintMatrix(A,size);	
 	}
 		printf("-----A----- After Iteration\n");
   		PrintMatrix(A,size);
-
+		freeSqrMat(A,size );
+	    freeSqrMat(Mi,size );
+		freeSqrMat(Qp,size );
 	  printf("\n\n\n----------Seccion 2 Corrimiento de Lambda------------\n");
 		double **P=AllocateMatrixSpace(size);
 		double miu=0.0;
 		double delta=0.001;
-		double sigma_aux=0;
-		double sigma=0; 
+		int sigma_aux=0;
+		int sigma=0; 
 		K = K_Process(M,Q,T,&h,size);
 		//P= k-miu*M
-		P= P_Process(K,miu,M,size);
-		//printf("-----A-----\n");
-  		//PrintMatrix(P,size);
-		sigma_aux=LU_Method(P,size);
 		printf("Proceso LU\n");
+		while(miu<30){
+			P= P_Process(K,miu,M,size);
+			sigma_aux=LU_Method(P,size);
+			miu+=delta;
+			if(sigma_aux>sigma)
+				sigma= sigma_aux;
+		}
+		printf("\n\tNo. de Valores propios son: %d\n", sigma);
 		
 		
+		
+		freeSqrMat(M,size);
+		freeSqrMat(Q,size);
+		freeSqrMat(T,size);
+		freeSqrMat(K,size);
+		freeSqrMat(P,size);
   printf("----------Seccion 3 RK ----------\n");
-	
+		
 	
 }
 
@@ -290,12 +306,30 @@ double** P_Process(double **K,double miu, double **M,int size){
 }
 
 int LU_Method(double **A,int size){
-	int sigma=0;
+	int k,sigma=0;
 	double *U = AllocateVectorSpace(size);
 	double *L= AllocateVectorSpace(size);
 	double *a = AllocateVectorSpace(size);
 	double *b = AllocateVectorSpace(size);
 	double *c = AllocateVectorSpace(size);
+	for(k=1;k<size;k++){
+		a[k]= A[k-1][k];
+	}
+	for(k=0;k<size;k++){
+		b[k]= A[k][k];
+	}
+	for(k=0;k<size-1;k++){
+		c[k]= A[k+1][k];
+	}
+	U[0]=A[0][0];
+	if(U[0]<0)
+		sigma++;
+	for (k=0;k<size-1;k++){
+		L[k+1]=a[k+1]/U[k];
+		U[k+1]=b[k+1]-(L[k+1]*c[k]);
+		if(U[k+1]<0)
+			sigma++;
+	}
 	return sigma;
 }
 double * AllocateVectorSpace(int size){
