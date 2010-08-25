@@ -12,7 +12,7 @@ int main(int argc, const char * argv[]){
   //double final = strtod(argv[2], (char **)NULL);
   double final=3.1416;
   int size = strtol(argv[1], (char **)NULL, 10);//atoi(argv[3]);//
-	
+  printf("\tProgramas para evaluar el Monopolo Mágnetico: -1/(x^3)\n");	
   printf("Start:\t%lf\n",start);
   printf("Final:\t%lf\n", final);
   printf("Size:\t%d\n", size);
@@ -44,7 +44,7 @@ int main(int argc, const char * argv[]){
   printf("Proceso Iterativo de QR\n");
   //PrintMatrix(A,size);
   //Qp = QR_Process(A);
-	for (i=0;i<80;i++){
+	for (i=0;i<80;i++){ //Cambiar por un while
 		A= Multiplication(M,K,size);
 		//printf("-----A-----\n");
 		//PrintMatrix(A,size);
@@ -55,14 +55,24 @@ int main(int argc, const char * argv[]){
 		//printf("-----K-----\n");
 		//PrintMatrix(K,size);	
 	}
-		printf("-----K----- After Iteration\n");
-  		PrintMatrix(K,size);
-  printf("----------Seccion 2 Corrimiento de Lambda------------\n");
+		printf("-----A----- After Iteration\n");
+  		PrintMatrix(A,size);
+
+	  printf("\n\n\n----------Seccion 2 Corrimiento de Lambda------------\n");
 		double **P=AllocateMatrixSpace(size);
-		double miu=0.001;
+		double miu=0.0;
+		double delta=0.001;
+		double sigma_aux=0;
+		double sigma=0; 
+		K = K_Process(M,Q,T,&h,size);
+		//P= k-miu*M
 		P= P_Process(K,miu,M,size);
-		printf("-----P-----\n");
-  		PrintMatrix(P,size);
+		//printf("-----A-----\n");
+  		//PrintMatrix(P,size);
+		sigma_aux=LU_Method(P,size);
+		printf("Proceso LU\n");
+		
+		
   printf("----------Seccion 3 RK ----------\n");
 	
 	
@@ -277,4 +287,18 @@ double** P_Process(double **K,double miu, double **M,int size){
 		}
 	}
 	return res;
+}
+
+int LU_Method(double **A,int size){
+	int sigma=0;
+	double *U = AllocateVectorSpace(size);
+	double *L= AllocateVectorSpace(size);
+	double *a = AllocateVectorSpace(size);
+	double *b = AllocateVectorSpace(size);
+	double *c = AllocateVectorSpace(size);
+	return sigma;
+}
+double * AllocateVectorSpace(int size){
+	double *m = (double*)malloc(sizeof(double)*size);
+	return m;
 }
