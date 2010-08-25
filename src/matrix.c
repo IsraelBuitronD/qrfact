@@ -38,8 +38,9 @@ void printDelimSqrMat(double** m, char delim, int size) {
 }
 
 int areEqualsSqrMat(double** m1, double** m2, int size) {
+	int j;
   for(int i=0; i<size; i++)
-    for(int j=0; j<size; j++)
+    for(j=0; j<size; j++)
       if(m1[i][j] != m2[i][j])
 	return NOT_EQUAL_VALUES;
 

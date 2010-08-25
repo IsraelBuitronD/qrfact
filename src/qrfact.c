@@ -48,7 +48,7 @@ int main(int argc, const char * argv[]){
   //PrintMatrix(A,size);
   //Qp = QR_Process(A);
     A= Multiplication(Mi,K,size);
-	for(i=0;i<120;i++){//while(*A[1,1]>eps){ //Cambiar por un while
+	for(i=0;i<150;i++){//while(*A[1,1]>eps){ //Cambiar por un while
 		Qp = QR_Method(A,size);
 		//printf("-----Qp-----\n");
 		//PrintMatrix(Qp,size);
@@ -73,7 +73,7 @@ int main(int argc, const char * argv[]){
 		K = K_Process(M,Q,T,&h,size);
 		//P= k-miu*M
 		printf("Proceso LU\n");
-		while(miu<30){
+		while(miu<3.1416){
 			P= P_Process(K,miu,M,size);
 			sigma_aux=LU_Method(P,size);
 			miu+=delta;
@@ -81,9 +81,6 @@ int main(int argc, const char * argv[]){
 				sigma= sigma_aux;
 		}
 		printf("\n\tNo. de Valores propios son: %d\n", sigma);
-		
-		
-		
 		freeSqrMat(M,size);
 		freeSqrMat(Q,size);
 		freeSqrMat(T,size);
@@ -104,7 +101,7 @@ double** AllocateMatrixSpace(int size){
 double** StartM(double*** T, int size){
   double** Res = AllocateMatrixSpace(size);
   *T = AllocateMatrixSpace(size);
-	
+#pragma omp parallel for	
   for(int i=0;i<size;i++){
     (*T)[i][i]=2.0*(1.0/12.0);
     if(i>0)
@@ -127,7 +124,7 @@ double** StartQ(double Start, double End, double* h, int size){
   double** res = AllocateMatrixSpace(size);
   *h = (End-Start)/(double)size;
   double x= Start;
-
+ 
   for(int i=0; i<size; i++) {
     for (int j=0; j<size; j++){
       /* 
@@ -152,9 +149,10 @@ double **K_Process(double **M, double **Q, double **T, double *h, int size) {
   //double **P_MQ = AllocateMatrixSpace(size);
   //P_MQ = Multiplication(M,Q,size);
   double **P_MQ = Multiplication(M,Q,size);
-
-  for(int i=0;i<size;i++)
-    for(int j=0;j<size;j++)
+int i,j;
+#pragma omp parallel for private(j)
+  for( i=0;i<size;i++)
+    for( j=0;j<size;j++)
       MR[i][j]= (((1/((*h)*(*h)))*T[i][j])+(P_MQ[i][j]));
 
   return MR;
@@ -162,10 +160,11 @@ double **K_Process(double **M, double **Q, double **T, double *h, int size) {
 
 double **Multiplication(double** matriz1, double** matriz2, int size){
   double **matrizR = AllocateMatrixSpace(size);
-
-  for(int i=0;i<size;i++)
-    for(int j=0;j<size;j++)
-      for(int k=0;k<size;k++)
+int i,j,k;
+//#pragma omp parallel for private(j,k)
+  for(i=0;i<size;i++)
+    for(j=0;j<size;j++)
+      for(k=0;k<size;k++)
 	    matrizR[i][j]+=matriz1[i][k]*matriz2[k][j];
 
   //PrintMatrix(matrizR,size);
@@ -222,6 +221,7 @@ double** QR_Method(double **a,int size){
 
 void CopyMatrix(double **a,double **b,int size){
 	int i,j;
+	#pragma omp parallel for private(j)
 	for(i=0;i<size;i++){
 		for(j=0;j<size;j++){
 			b[i][j]=a[i][j];
@@ -297,6 +297,7 @@ double** P_Process(double **K,double miu, double **M,int size){
 	double **res= NULL;
 	res = AllocateMatrixSpace(size);
 	int i,j;
+	#pragma omp parallel for private(j)
 	for(i=0;i<size;i++){
 		for(j=0;j<size;j++){
 			res[i][j]=((K[i][j])-(miu*M[i][j]));
