@@ -138,3 +138,26 @@ double** comatrix(double **a, int size) {
 
   return b;
 }
+
+double** applyScalarMultiplication(double** m, int size, double scalar) {
+  for(int i=0; i<size; i++)
+    for(int j=0; j<size; j++)
+      m[i][j] *= scalar;
+  
+  return m;
+}
+
+double** getSqrMatInverse(double** m, int size) {
+  double det = determinant(m, 3);
+
+  if(det==0.0) {
+    fprintf(stderr, "Determinant zero implies not inverse matrix.\n");
+    exit(EXIT_FAILURE);
+  }
+
+  double** comat = comatrix(m,size);
+  applyTranspose(comat,size);
+  applyScalarMultiplication(comat,size,1/det);
+
+  return comat;
+}
