@@ -21,5 +21,6 @@ void WriteToFile(FILE*, double**,int);
 double **P_Process(double**,double,double**,int size);
 int LU_Method(double **,int);
 double * AllocateVectorSpace(int);
+double fuvx(double, double,double);
 
 #endif

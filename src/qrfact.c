@@ -48,7 +48,7 @@ int main(int argc, const char * argv[]){
   //PrintMatrix(A,size);
   //Qp = QR_Process(A);
     A= Multiplication(Mi,K,size);
-	for(i=0;i<150;i++){//while(*A[1,1]>eps){ //Cambiar por un while
+	for(i=0;i<100;i++){//while(*A[1,1]>eps){ //Cambiar por un while
 		Qp = QR_Method(A,size);
 		//printf("-----Qp-----\n");
 		//PrintMatrix(Qp,size);
@@ -57,7 +57,8 @@ int main(int argc, const char * argv[]){
 		//PrintMatrix(K,size);
 		A= Multiplication(Mi,K,size);
 		//printf("-----A-----\n");
-		//PrintMatrix(A,size);	
+		//PrintMatrix(A,size);
+		printf("Iteración %d",i);	
 	}
 		printf("-----A----- After Iteration\n");
   		PrintMatrix(A,size);
@@ -66,29 +67,70 @@ int main(int argc, const char * argv[]){
 		freeSqrMat(Qp,size );
 	  printf("\n\n\n----------Seccion 2 Corrimiento de Lambda------------\n");
 		double **P=AllocateMatrixSpace(size);
-		double miu=0.0;
-		double delta=0.001;
+		double miu=-15.0;
+		double miuf;
+		double delta=0.0001;
 		int sigma_aux=0;
 		int sigma=0; 
 		K = K_Process(M,Q,T,&h,size);
 		//P= k-miu*M
 		printf("Proceso LU\n");
+		miuf=miu;
 		while(miu<3.1416){
 			P= P_Process(K,miu,M,size);
 			sigma_aux=LU_Method(P,size);
-			miu+=delta;
-			if(sigma_aux>sigma)
+			if(sigma_aux>sigma){
 				sigma= sigma_aux;
+				miuf=miu;
+				printf("\n\tNo. de Valores propios son: %d  para un \n ", sigma);
+				printf("Miu de: %lf",miuf);
+			}
+			miu+=delta;
 		}
-		printf("\n\tNo. de Valores propios son: %d\n", sigma);
 		freeSqrMat(M,size);
 		freeSqrMat(Q,size);
 		freeSqrMat(T,size);
 		freeSqrMat(K,size);
 		freeSqrMat(P,size);
-  printf("----------Seccion 3 RK ----------\n");
-		
-	
+  printf("\n\n\n----------Seccion 3 RK ----------\n");
+		double lambda=0.001;
+		double x,u,v,k1,k2,k3,k4,l1,l2,l3,l4;
+		delta = 0.001;
+		printf("\tH %lf",h);
+		while (lambda<3.1416){
+			u=0.0;v=1.0;
+			for(x=0.001;x<final;x+=h)
+			{
+				k1=h*v;
+				//printf("k1 %lf ",k1);
+				//printf("Entrada de f: %lf  %lf  %lf\n",u,x,lambda);
+				l1=h*fuvx(u,x,lambda);
+			    //printf("l1 %lf ",l1);
+				k2=h*(v+(l1/2.0));
+				//printf("k2 %lf ",k2);
+				l2=h*fuvx((u+(k1/2.0)),(x+(h/2.0)),lambda);
+				//printf("l2 %lf ",l2);
+				k3=h*(v+(l2/2.0));
+				//printf("k3 %lf ",k3);
+				l3=h*fuvx((u+(k2/2.0)),(x+(h/2.0)),lambda);
+				//printf("l3 %lf ",l3);
+				k4=h*(v+(l3/2.0));
+				//printf("k4 %lf ",k4);
+				l4=h*fuvx((u+k3),(x+h),lambda);
+				//printf("l4 %lf ",l4);
+				u=u+((1.0/6.0)*(k1+(2.0*k2)+(2.0*k3)+k4));
+				//printf("u %lf ",u);
+				v=v+((1.0/6.0)*(l1+(2.0*l2)+(2.0*l3)+l4));
+				//printf("v %lf \n\n",v);
+				if(x==10.0)
+					exit(0);
+			}
+			//printf("\nLambda:%lf %lf",fabs(u),lambda);
+			if(fabs(u)<0.05)
+				printf("\nLambda:%lf %lf",fabs(u),lambda);
+			lambda+=delta;
+		}	
+		//printf("\tendwhile\n");
 }
 
 double** AllocateMatrixSpace(int size){
@@ -336,4 +378,10 @@ int LU_Method(double **A,int size){
 double * AllocateVectorSpace(int size){
 	double *m = (double*)malloc(sizeof(double)*size);
 	return m;
+}
+
+double fuvx(double u,double x,double lambda){
+	double ans=0.0;
+		ans= (((-1.0)/(x*x*x))-lambda)*u;
+	return ans;
 }
