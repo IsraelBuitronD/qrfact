@@ -15,5 +15,6 @@ double** getIdentitySqrMat(int);
 double determinant(double**, int);
 double** comatrix(double **, int);
 double** applyScalarMultiplication(double**, int, double);
+double** getSqrMatInverse(double**, int);
 
 #endif

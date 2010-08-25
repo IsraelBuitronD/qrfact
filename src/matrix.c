@@ -146,3 +146,18 @@ double** applyScalarMultiplication(double** m, int size, double scalar) {
   
   return m;
 }
+
+double** getSqrMatInverse(double** m, int size) {
+  double det = determinant(m, 3);
+
+  if(det==0.0) {
+    fprintf(stderr, "Determinant zero implies not inverse matrix.\n");
+    exit(EXIT_FAILURE);
+  }
+
+  double** comat = comatrix(m,size);
+  applyTranspose(comat,size);
+  applyScalarMultiplication(comat,size,1/det);
+
+  return comat;
+}
