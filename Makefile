@@ -6,6 +6,9 @@ BIN_DIR=bin
 
 all:	clean qrfact
 
+square_matrix.o:	
+	${CC} ${CFLAGS} -c -fopenmp -o ${BIN_DIR}/square_matrix.o ${SRC_DIR}/square_matrix.c
+
 qrfact.o:	
 	${CC} ${CFLAGS} -c -fopenmp -o ${BIN_DIR}/qrfact.o ${SRC_DIR}/qrfact.c
 
