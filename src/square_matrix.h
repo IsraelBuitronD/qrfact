@@ -5,7 +5,6 @@
 #define NOT_EQUAL_VALUES 0
 
 void applyTranspose(double**, int);
-//double** getTranspose(double**, int);
 void printSqrMat(double**, int);
 void printDelimSqrMat(double**, char, int);
 int areEqualsSqrMat(double**, double**, int);
