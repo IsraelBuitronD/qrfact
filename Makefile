@@ -18,6 +18,11 @@ test_square_matrix.o: square_matrix.o
 	${BIN_DIR}/square_matrix.o \
 	${SRC_DIR}/test_square_matrix.c
 
+magnetic_monopole.o: square_matrix.o vector.o
+	${CC} ${CFLAGS} -c -fopenmp \
+	-o ${BIN_DIR}/magnetic_monopole.o \
+	${SRC_DIR}/magnetic_monopole.c
+
 vector.o: 
 	${CC} ${CFLAGS} -c -fopenmp \
 	-o ${BIN_DIR}/vector.o \
