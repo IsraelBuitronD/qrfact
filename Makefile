@@ -18,6 +18,11 @@ test_square_matrix.o: square_matrix.o
 	${BIN_DIR}/square_matrix.o \
 	${SRC_DIR}/test_square_matrix.c
 
+vector.o: 
+	${CC} ${CFLAGS} -c -fopenmp \
+	-o ${BIN_DIR}/vector.o \
+	${SRC_DIR}/vector.c
+
 qrfact.o:	
 	${CC} ${CFLAGS} -c -fopenmp \
 	-o ${BIN_DIR}/qrfact.o \
