@@ -16,5 +16,6 @@ double** comatrix(double **, int);
 double** applyScalarMultiplication(double**, int, double);
 double** getSqrMatInverse(double**, int);
 double** cloneSqrMat(double **, int);
+double** getSqrMatMulti(double**, double**, int);
 
 #endif

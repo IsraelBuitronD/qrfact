@@ -177,3 +177,16 @@ double** cloneSqrMat(double **a, int size) {
     
   return b;
 }
+
+
+double** getSqrMatMulti(double** m1, double** m2, int size) {
+  double **mR = getZeroSqrMat(size);
+  int i,j,k;
+  
+  for(i=0;i<size;i++)
+    for(j=0;j<size;j++)
+      for(k=0;k<size;k++)
+	mR[i][j] += m1[i][k]*m2[k][j];
+
+  return mR;
+}
