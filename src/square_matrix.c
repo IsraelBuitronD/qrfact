@@ -18,11 +18,11 @@ void applyTranspose(double** m, int n) {
   }
 }
 
-void printSqrMat(double** m, int size) {
+void printSqrMat(const double** m, int size) {
   printDelimSqrMat(m,'\t',size);
 }
 
-void printDelimSqrMat(double** m, char delim, int size) {
+void printDelimSqrMat(const double** m, char delim, int size) {
   for(int i=0; i<size; i++) {
     for(int j=0; j<size; j++)
       printf("%lf%c",m[i][j],delim);
@@ -30,7 +30,7 @@ void printDelimSqrMat(double** m, char delim, int size) {
   }
 }
 
-int areEqualsSqrMat(double** m1, double** m2, int size) {
+int areEqualsSqrMat(const double** m1, const double** m2, int size) {
   int i,j;
 
   for(i=0; i<size; i++)
@@ -52,6 +52,15 @@ double** getZeroSqrMat(int size) {
   return mat;
 }
 
+double** fillZeroSqrMat(double** m, int size) {
+  int i,j;
+  for(i=0; i<size; i++)
+    for(j=0; j<size; j++)
+      m[i][j] = 0;
+
+  return m;
+}
+
 double** freeSqrMat(double** m, int size) {
   int i;
 #pragma omp parallel for 
@@ -61,7 +70,7 @@ double** freeSqrMat(double** m, int size) {
   free(m);
   return m;
 }
-
+ 
 double** getIdentitySqrMat(int size) {
   double** mat = (double**)calloc(size,sizeof(double*));
   for(int i=0; i<size; i++) {
@@ -72,7 +81,15 @@ double** getIdentitySqrMat(int size) {
   return mat;
 }
 
-double determinant(double **a,int size) {
+double** fillIdentitySqrMat(double** m, int size) {
+  for(int i=0; i<size; i++)
+    for(int j=0; j<size; j++)
+      m[i][j] = i==j ? 1 : 0;
+
+  return m;
+}
+
+double determinant(const double **a,int size) {
   if (size < 1) { // Invalid matrix size
     fprintf(stderr, "Matrix size must be greater than zero.\n");
     exit(EXIT_FAILURE);
@@ -88,9 +105,8 @@ double determinant(double **a,int size) {
   
   double det = 0;
   
+  double **m = getZeroSqrMat(size-1);
   for(int j1=0; j1<size; j1++) {
-    double **m = getZeroSqrMat(size-1);
-
     for(int i=1;i<size;i++)
       for(int j=0, j2=0; j<size; j++) {
 	if (j == j1)
@@ -99,16 +115,20 @@ double determinant(double **a,int size) {
 	j2++;
       }
 
-    det += pow(-1.0,j1+2.0) * a[0][j1] * determinant(m,size-1);
-
-    freeSqrMat(m,size-1);    
+    det += pow(-1.0,j1+2.0) * a[0][j1] * determinant((const double**)m,size-1);
   }
+  freeSqrMat(m,size-1);
 
   return det;
 }
 
-double** comatrix(double **a, int size) {
-  double **b = getZeroSqrMat(size);
+double** comatrix(const double **a, int size) {
+  double **co = getZeroSqrMat(size);
+  applyComatrix(a, co, size);
+  return co;
+}
+
+double** applyComatrix(const double** a, double** co, int size) {
   double **c = getZeroSqrMat(size-1);
 
   for(int j=0;j<size;j++) {
@@ -128,16 +148,16 @@ double** comatrix(double **a, int size) {
       }
 
       // Compute determinat
-      double det = determinant(c,size-1);
+      double det = determinant((const double**)c,size-1);
 
       // Fill comatrix elements
-      b[i][j] = pow(-1.0,i+j+2.0) * det;
+      co[i][j] = pow(-1.0,i+j+2.0) * det;
     }
   }
 
   freeSqrMat(c,size-1);
 
-  return b;
+  return co;
 }
 
 double** applyScalarMultiplication(double** m, int size, double scalar) {
@@ -151,7 +171,7 @@ double** applyScalarMultiplication(double** m, int size, double scalar) {
   return m;
 }
 
-double** getSqrMatInverse(double** m, int size) {
+double** getSqrMatInverse(const double** m, int size) {
   double det = determinant(m, 3);
 
   if(det==0.0) {
@@ -166,27 +186,36 @@ double** getSqrMatInverse(double** m, int size) {
   return comat;
 }
 
-double** cloneSqrMat(double **a, int size) {
-  double **b = getZeroSqrMat(size);
+double** cloneSqrMat(const double** a, int size) {
+  double** b = getZeroSqrMat(size);
+  copySqrMat(a, b, size);
+  return b;
+}
+
+double** copySqrMat(const double** a, double** b, int size) {
   int i,j;
   
 #pragma omp parallel for private(j)
   for(i=0; i<size; i++)
     for(j=0; j<size; j++)
-      b[i][j]=a[i][j];
+      b[i][j] = a[i][j];
     
   return b;
 }
 
-
-double** getSqrMatMulti(double** m1, double** m2, int size) {
+double** getSqrMatMulti(const double** m1, const double** m2, int size) {
   double **mR = getZeroSqrMat(size);
+  applySqrMatMulti(m1, m2, mR, size);
+  return mR;
+}
+
+double** applySqrMatMulti(const double** a, const double** b, double** c, int size) {
   int i,j,k;
   
   for(i=0;i<size;i++)
     for(j=0;j<size;j++)
       for(k=0;k<size;k++)
-	mR[i][j] += m1[i][k]*m2[k][j];
+	c[i][j] += a[i][k] * b[k][j];
 
-  return mR;
+  return c;
 }

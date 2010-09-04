@@ -5,17 +5,22 @@
 #define NOT_EQUAL_VALUES 0
 
 void applyTranspose(double**, int);
-void printSqrMat(double**, int);
-void printDelimSqrMat(double**, char, int);
-int areEqualsSqrMat(double**, double**, int);
+void printSqrMat(const double**, int);
+void printDelimSqrMat(const double**, char, int);
+int areEqualsSqrMat(const double**, const double**, int);
 double** getZeroSqrMat(int);
+double** fillZeroSqrMat(double**, int);
 double** freeSqrMat(double**, int);
 double** getIdentitySqrMat(int);
-double determinant(double**, int);
-double** comatrix(double **, int);
+double** fillIdentitySqrMat(double**, int);
+double determinant(const double**, int);
+double** comatrix(const double**, int);
+double** applyComatrix(const double**, double**, int);
 double** applyScalarMultiplication(double**, int, double);
-double** getSqrMatInverse(double**, int);
-double** cloneSqrMat(double **, int);
-double** getSqrMatMulti(double**, double**, int);
+double** getSqrMatInverse(const double**, int);
+double** cloneSqrMat(const double**, int);
+double** copySqrMat(const double**, double**, int);
+double** getSqrMatMulti(const double**, const double**, int);
+double** applySqrMatMulti(const double**, const double**, double**, int);
 
 #endif
